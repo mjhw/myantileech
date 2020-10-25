@@ -7,7 +7,7 @@ ifdef DEBUG
 override __version := -dbg$(__version)
 endif
 ##
-project_name := $(notdir $(CURDIR))$(__version)
+project_name := antiLeech
 ## 三选一: lib 静态库、 dll 动态库、 bin 可执行文件
 target_type := dll
 ##

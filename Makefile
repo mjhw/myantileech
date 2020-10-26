@@ -152,4 +152,3 @@ dist:
 	$(RM) $(dist_file)
 	$(__tar) $(dist_file) --exclude-vcs --exclude='$(dist_dir)' \
 --exclude='$(__target_dir)' --exclude='*.o' --exclude='*.d' ./
-

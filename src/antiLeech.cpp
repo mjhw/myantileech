@@ -138,30 +138,25 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Hard(LPCTSTR modversion,
     if (STRSTR(clientversion, _T("eMule"))) {
       if (!STRSTR(clientversion, _T("eMule v0.50a")) &&
           !STRSTR(clientversion, _T("eMule v0.50b")) &&
+          !STRSTR(clientversion, _T("eMule v0.60a")) &&
           !STRSTR(clientversion, _T("eMule v0.51d"))) {
         return _T("Bad eMule");
       }
     }
     if (STRSTR(clientversion, _T("aMule"))) {
-      // TODO
-    }
-    if (STRSTR(clientversion, _T("Shareaza"))) {
-      if (!STRSTR(clientversion, _T("Shareaza v2."))) {
-        return _T("Bad Shareaza");
+      if (!STRSTR(clientversion, _T("aMule v2.3.2")) &&
+          !STRSTR(clientversion, _T("aMule v2.3.1"))) {
+        return _T("Bad eMule");
       }
     }
     // TODO
   } else {
-    if (!STRSTR(clientversion, _T("eMule v0.50a")) &&
-        !STRSTR(clientversion, _T("eMule v0.50b")) &&
-        !STRSTR(clientversion, _T("eMule v0.51d"))) {
-      return _T("Bad MODSTRING");
+    LPCTSTR regex = _T("^eMule v0.[56][01][abd] - [a-z]+ v?[0-9.a-z_-]+");
+    if (STREICMP(modversion, regex) != 0) {
+      return _T("Bad Modstring Scheme");
     }
     if (STRISTR(clientversion, _T("aMule"))) {
       return _T("Fake aMule");
-    }
-    if (STRISTR(clientversion, _T("Shareaza"))) {
-      return _T("Fake Shareaza");
     }
     // TODO
   }
@@ -173,65 +168,6 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Hard(LPCTSTR modversion,
     if (denylist.check(modversion, denylist.data[i]))
       return _T("Bad MODSTRING");
   }
-
-  // WiZaRd Bad Modstring Scheme
-  if (IS_EMPTY(modversion) ||
-      (STRSTR(modversion, _T("CHN ")) == &modversion[0] &&
-       STRLEN(modversion) > 8) ||
-      (STRSTR(modversion, _T("Apollo")) ==
-       &modversion[0]) // Apollo is a Portugal Mod
-      || (STRSTR(modversion, _T("sivka")) == &modversion[0]) ||
-      (STRSTR(modversion, _T("aMule CVS")) == &modversion[0])
-      /* END */) {
-    ; // do nothing
-  } else {
-    const int modLen = (int)STRLEN(modversion);
-    if (STRSTR(clientversion, _T("eMule v")) &&
-        modLen <= 4) { // most of them are fincan
-      return _T("Bad Modstring Scheme");
-    }
-    int iNumberFound = -1;
-    _TINT ch;
-    bool bBad = false;
-    bool bNotEnd = false;
-    for (int i = 0; i < modLen && bBad == false; ++i) {
-      ch = modversion[i];
-      if (ch == _T('.') || ch == _T(' ')) {
-        bNotEnd = true;    // these chars should not be the end of modstring
-        iNumberFound = -1; // this is a simple hack to not punish mods like TK4
-                           // or Spike2 :)
-        continue;          // skip "legal" chars
-      }
-      if (ch ==
-          _T('-') /* || ch == _T('+') */) { // connector characters, connect
-                                            // two string or two numbers
-        bNotEnd = true; // these chars should not be the end of modstring
-        if (iNumberFound != -1)
-          iNumberFound++; // exclude some modstring like v#.#-a1
-        continue;
-      }
-      if (ISPUNCT(ch) || ISSPACE(ch))
-        bBad = true; // illegal punctuation or whitespace character
-      else if (ISCNTRL(ch))
-        bBad = true; // control character in modstring!?
-      else {
-        bNotEnd = false;
-        if (ISDIGIT(ch))
-          iNumberFound = i;
-        else if ((iNumberFound == i - 1) &&
-                 ISXDIGIT(ch)) { // abcdef is legal in the end of version
-                                 // number, also exclude bowlfish tk4 and so on
-          ;                      // do nothing
-        } else if (iNumberFound != -1) { // that is: number out of row, e.g.
-                                         // not MorphXT v11.9 but Morph11XT.9
-          bBad = true;
-        }
-      }
-    }
-    if (bBad || bNotEnd)
-      return _T("Bad Modstring Scheme");
-  }
-  // WiZaRd
 
   // Add by SDC team.
 #if defined(SPECIAL_DLP_VERSION)

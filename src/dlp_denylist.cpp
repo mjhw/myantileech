@@ -4,10 +4,6 @@
 //////////////////////////////////////////////////////////////////////////
 #include "dlp_denylist.h"
 
-#include <ctype.h>
-#include <stdio.h>
-#include <string.h>
-
 #if defined(DLP_CXX11)
 #include <mutex>
 #elif defined(DLP_WIN32)

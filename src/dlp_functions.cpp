@@ -5,6 +5,8 @@
 //////////////////////////////////////////////////////////////////////////
 #include "dlp_functions.h"
 
+#include <stdio.h>
+
 #include <regex>
 
 #define ARRAY_COUNT(a) int(sizeof(a) / sizeof(a[0]))
@@ -16,8 +18,10 @@ LPCTSTR STRESTR(LPCTSTR s, LPCTSTR regex) {
     if (std::regex_search(s, m, re)) {
       return m[0].first;
     }
-  } catch (...) {
-    // ;
+  } catch (std::exception& e) {
+    // TODO
+    fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
+    fflush(stderr);
   }
   return NULL;
 }
@@ -30,10 +34,41 @@ LPCTSTR STREISTR(LPCTSTR s, LPCTSTR regex) {
     if (std::regex_search(s, m, re)) {
       return m[0].first;
     }
-  } catch (...) {
-    // ;
+  } catch (std::exception& e) {
+    // TODO
+    fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
+    fflush(stderr);
   }
   return NULL;
+}
+
+int STRECMP(LPCTSTR s, LPCTSTR regex) {
+  try {
+    std::basic_regex<TCHAR> re(regex, std::regex::ECMAScript);
+    if (std::regex_match(s, re)) {
+      return 0;
+    }
+  } catch (std::exception& e) {
+    // TODO
+    fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
+    fflush(stderr);
+  }
+  return 1;
+}
+
+int STREICMP(LPCTSTR s, LPCTSTR regex) {
+  try {
+    std::basic_regex<TCHAR> re(regex,
+                               std::regex::ECMAScript | std::regex::icase);
+    if (std::regex_match(s, re)) {
+      return 0;
+    }
+  } catch (std::exception& e) {
+    // TODO
+    fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
+    fflush(stderr);
+  }
+  return 1;
 }
 
 #ifndef DLP_WIN32

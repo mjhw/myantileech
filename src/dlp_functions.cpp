@@ -18,7 +18,7 @@ LPCTSTR STRESTR(LPCTSTR s, LPCTSTR regex) {
     if (std::regex_search(s, m, re)) {
       return m[0].first;
     }
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     // TODO
     fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
     fflush(stderr);
@@ -34,7 +34,7 @@ LPCTSTR STREISTR(LPCTSTR s, LPCTSTR regex) {
     if (std::regex_search(s, m, re)) {
       return m[0].first;
     }
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     // TODO
     fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
     fflush(stderr);
@@ -48,7 +48,7 @@ int STRECMP(LPCTSTR s, LPCTSTR regex) {
     if (std::regex_match(s, re)) {
       return 0;
     }
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     // TODO
     fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
     fflush(stderr);
@@ -63,7 +63,7 @@ int STREICMP(LPCTSTR s, LPCTSTR regex) {
     if (std::regex_match(s, re)) {
       return 0;
     }
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     // TODO
     fprintf(stderr, "[DLP_DEBUG] %s:%u: %s\n", __FILE__, __LINE__, e.what());
     fflush(stderr);

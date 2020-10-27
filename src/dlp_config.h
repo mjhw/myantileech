@@ -10,5 +10,8 @@
 #define SPECIAL_DLP_VERSION
 #define DLP_CHAR_TYPE wchar_t
 #define DLP_WINT_TYPE wint_t
+#define DLP_VERSION_PATCH(Major, Minor, Patch)                                 \
+  (Major * 10000UL + Minor * 100UL + Patch)
+#define DLP_VERSION DLP_VERSION_PATCH(1, 0, 0)
 
 #endif // DLP_ONCE__DLP_CONFIG

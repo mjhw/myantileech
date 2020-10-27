@@ -21,14 +21,6 @@
 #include "dlp_denylist.h"
 #include "dlp_functions.h"
 
-// Add by SDC team.
-#if defined(SPECIAL_DLP_VERSION)
-#define DLPVERSION 44005
-#define SDC_VERSION_DETACH 44, 0, 0, 5
-#else // Official
-#define DLPVERSION 44
-#endif
-
 #ifdef DLP_WIN32
 #define CantiLeech__ DLP_API
 #else
@@ -120,7 +112,7 @@ void CantiLeech__ TestFunc() {
 }
 #endif
 
-DWORD CantiLeech__ GetDLPVersion() { return DLPVERSION; }
+DWORD CantiLeech__ GetDLPVersion() { return DLP_VERSION; }
 
 LPCTSTR CantiLeech__ DLPCheckUserhash(const PBYTE userhash) {
   // No more AJ check
@@ -136,28 +128,23 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Hard(LPCTSTR modversion,
   /// Allow-List:
   if (IS_EMPTY(modversion)) {
     if (STRSTR(clientversion, _T("eMule"))) {
-      if (!STRSTR(clientversion, _T("eMule v0.50a")) &&
-          !STRSTR(clientversion, _T("eMule v0.50b")) &&
-          !STRSTR(clientversion, _T("eMule v0.60a")) &&
-          !STRSTR(clientversion, _T("eMule v0.51d"))) {
-        return _T("Bad eMule");
+      if (STRECMP(clientversion, _T("eMule v0.(50a|50b|51d|60a)")) != 0) {
+        return _T("Old eMule");
       }
     }
     if (STRSTR(clientversion, _T("aMule"))) {
-      if (!STRSTR(clientversion, _T("aMule v2.3.2")) &&
-          !STRSTR(clientversion, _T("aMule v2.3.1"))) {
-        return _T("Bad eMule");
+      if (STRECMP(clientversion, _T("aMule v2.3.[12]")) != 0) {
+        return _T("Old aMule");
       }
     }
     // TODO
   } else {
-    LPCTSTR regex = _T("eMule v0.[56][01][abd] - [a-z]+ v?[0-9.a-z_-]+");
-    if (STREICMP(clientversion, regex) != 0) {
-      DLP_CDBG << _T("CilentVersion:\"") << clientversion << "\"" << std::endl;
+    LPCTSTR regex = _T("eMule v0.[56][01][abd] - [A-Za-z]+ v?[0-9.A-Za-z_-]+");
+    if (STRECMP(clientversion, regex) != 0) {
+      if (STRISTR(clientversion, _T("aMule"))) {
+        return _T("Fake aMule");
+      }
       return _T("Bad Modstring Scheme");
-    }
-    if (STRISTR(clientversion, _T("aMule"))) {
-      return _T("Fake aMule");
     }
     // TODO
   }
@@ -169,29 +156,6 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Hard(LPCTSTR modversion,
     if (denylist.check(modversion, denylist.data[i]))
       return _T("Bad MODSTRING");
   }
-
-  // Add by SDC team.
-#if defined(SPECIAL_DLP_VERSION)
-  // Some Bad MODSTRING check
-  if (STRSTR(modversion, _T("eMule-GIFC")) // GPL-Breaker [DragonD]
-      || (STRSTR(clientversion, _T("0.49c")) &&
-          STRSTR(modversion, _T("X-Ray 2."))) // Fake X-Ray Mod [**Riso64Bit**]
-      || (STRSTR(clientversion, _T("0.48a")) &&
-          STRSTR(modversion, _T("MorphCA"))) // Fake MorphCA [DargonD]
-      || STRSTR(modversion, _T("0.50a")) // It should be a ClientVersion, not a
-                                         // ModString [DargonD]
-      || STRSTR(clientversion, _T("4.0h")) // New SpeedyP2P client
-      || STRSTR(modversion, _T("OS"))      // GPL-Breaker [ieD2k]
-      || STRSTR(modversion, _T("THC"))     // Fake queues client [Bill Lee]
-      || STRSTR(modversion, _T("EggAche")) // Custom ModString
-      || STRSTR(modversion, _T("DarkSky")) // Custom ModString
-      || STRSTR(clientversion,
-                _T("eMule v5.6a")) // Fake official version [冰靈曦曉]
-      || STRSTR(modversion, _T("eMuleTorrent")) // GPL-Breaker [冰靈曦曉]
-      /* END */) {
-    return _T("[SDC] Bad ModString");
-  }
-#endif
 
   return NULL;
 }

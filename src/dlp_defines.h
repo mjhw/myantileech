@@ -11,8 +11,10 @@
 #include "dlp_config.h"
 //////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
+#include <assert.h>
 #include <wchar.h>
+
+#include <iostream>
 
 #if defined(DLP_USE_DLLEXPORT) && defined(DLP_USE_DLLIMPORT)
 #error ""
@@ -69,6 +71,12 @@
 enum { dlp_use_cdbg = 1 };
 #else
 enum { dlp_use_cdbg = 0 };
+#endif
+
+#ifdef DLP_USE_ASSERT
+#define DLP_ASSERT(bX) assert(bX)
+#else
+#define DLP_ASSERT(bX) static_cast<void>(0)
 #endif
 
 ////////////////////////////////////////////////////////////////////////

@@ -32,7 +32,7 @@ lib_dirs :=
 flags := -fPIC -O2
 # flags += -Wall -Werror -Wextra
 ## 预编译器的宏
-defines := NDEBUG
+defines :=
 
 ### 私有变量 ##################################################################
 ifeq ($(strip $(target_type)),lib)
@@ -49,6 +49,7 @@ override __target_file := $(__target_dir)/$(project_name)
 endif
 endif
 endif
+override __target_basename := $(notdir $(__target_file))
 
 override __src_files := $(src_files)
 ifneq ($(strip $(src_root_dir)),)
@@ -139,7 +140,8 @@ endif
 install:
 	$(__testfile) $(__target_file)
 	$(__mkdir) $(install_dir)
-	$(__testfile) $(install_dir)/$(__target_file) && $(__mv) $(install_dir)/$(__target_file).old
+	$(__testfile) $(install_dir)/$(__target_basename) && \
+$(__mv) $(install_dir)/$(__target_basename) $(install_dir)/$(__target_basename).old
 	$(__install) $(__target_file) $(install_dir)
 
 clean:

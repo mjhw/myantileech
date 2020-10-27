@@ -41,7 +41,7 @@ BEGIN_PRIVATE_NAMESPACE
 XX_GENERATE_CODES(XX)
 #undef XX
 
-void InitDenyList(void) {
+void InitGlobalDenyList(void) {
 #define XX(dl) dl##_pptr = dl;
   XX_GENERATE_CODES(XX)
 #undef XX
@@ -49,28 +49,28 @@ void InitDenyList(void) {
 
 END_PRIVATE_NAMESPACE
 
-void InitOnceDenyList() {
+void InitOnceGlobalDenyList() {
 #if defined(DLP_CXX11)
   static std::once_flag once_flag;
   try {
-    std::call_once(once_flag, p__::InitDenyList);
+    std::call_once(once_flag, p__::InitGlobalDenyList);
   } catch (...) {
     // TODO
   }
 #elif defined(DLP_WIN32)
   static ::INIT_ONCE once_flag = INIT_ONCE_STATIC_INIT;
   BOOL status =
-      ::InitOnceExecuteOnce(&once_flag, p__::InitDenyList, NULL, NULL);
+      ::InitOnceExecuteOnce(&once_flag, p__::InitGlobalDenyList, NULL, NULL);
   // TODO
   (void)status;
 #else
   static ::pthread_once_t once_flag = PTHREAD_ONCE_INIT;
-  ::pthread_once(&once_flag, p__::InitDenyList); // always returns 0.
+  ::pthread_once(&once_flag, p__::InitGlobalDenyList); // always returns 0.
 #endif
 }
 
 DenyList *GetDenyList(DenyList *list) {
-  InitOnceDenyList();
+  InitOnceGlobalDenyList();
   size_t opts = list->options & ~(DenyList_CaseInsensitive | DenyList_Regex);
 
 #define XX(dl)                                                                 \
@@ -87,6 +87,9 @@ DenyList *GetDenyList(DenyList *list) {
     XX(DLP_USERNAME_CASE_INSENSITIVE_HARD);
     break;
   default:
+    DLP_CDBG << _T("Invalid DenyList_Options: (hex)") << std::hex
+             << list->options << std::dec << std::endl;
+    DLP_ASSERT(false);
     list->data = NULL;
     list->size = 0;
     list->check = NULL;
@@ -109,6 +112,9 @@ DenyList *GetDenyList(DenyList *list) {
       list->check = STREISTR;
       break;
     default:
+      DLP_CDBG << _T("Invalid DenyList_Options: (hex)") << std::hex
+               << list->options << std::dec << std::endl;
+      DLP_ASSERT(false);
       list->data = NULL;
       list->size = 0;
       list->check = NULL;

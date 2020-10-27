@@ -90,6 +90,7 @@ override __mkdir := /bin/mkdir -p
 override __testdir := /bin/test -d
 override __testfile := /bin/test -f
 override __sed := /bin/sed -e
+override __mv := /bin/mv
 
 #vpath %.hpp $(inc_dirs)
 
@@ -138,6 +139,7 @@ endif
 install:
 	$(__testfile) $(__target_file)
 	$(__mkdir) $(install_dir)
+	$(__testfile) $(install_dir)/$(__target_file) && $(__mv) $(install_dir)/$(__target_file).old
 	$(__install) $(__target_file) $(install_dir)
 
 clean:

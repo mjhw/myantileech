@@ -151,8 +151,9 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Hard(LPCTSTR modversion,
     }
     // TODO
   } else {
-    LPCTSTR regex = _T("^eMule v0.[56][01][abd] - [a-z]+ v?[0-9.a-z_-]+");
-    if (STREICMP(modversion, regex) != 0) {
+    LPCTSTR regex = _T("eMule v0.[56][01][abd] - [a-z]+ v?[0-9.a-z_-]+");
+    if (STREICMP(clientversion, regex) != 0) {
+      DLP_CDBG << _T("CilentVersion:\"") << clientversion << "\"" << std::endl;
       return _T("Bad Modstring Scheme");
     }
     if (STRISTR(clientversion, _T("aMule"))) {

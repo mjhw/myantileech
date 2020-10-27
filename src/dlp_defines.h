@@ -11,6 +11,7 @@
 #include "dlp_config.h"
 //////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 #include <wchar.h>
 
 #if defined(DLP_USE_DLLEXPORT) && defined(DLP_USE_DLLIMPORT)
@@ -57,6 +58,18 @@
 
 #define DLP_L(s) L##s
 #define DLP_C(s) // Comment
+#define DLP_COUT std::wcout
+#define DLP_CERR std::wcerr
+#define DLP_CDBG                                                               \
+  if (::dlp_use_cdbg)                                                          \
+  DLP_CERR << DLP_L("[DLP_DEBUG] ") << __FILE__ << DLP_L(':') << __LINE__      \
+           << DLP_L(": ")
+
+#ifdef DLP_USE_CDBG
+enum { dlp_use_cdbg = 1 };
+#else
+enum { dlp_use_cdbg = 0 };
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 DLP_BEGIN_NAMESPACE

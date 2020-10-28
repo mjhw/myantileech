@@ -41,32 +41,6 @@ using DLP_NAMESPACE::DenyListOptions;
 
 namespace {
 
-//>>> eWombat [SNAFU_V3]
-LPCTSTR apszSnafuTag[] = {
-    _T("[DodgeBoards]"),
-    _T("[DodgeBoards & DarkMule eVorteX]"),
-    _T("[DarkMule v6 eVorteX]"),
-    _T("[eMuleReactor]"),
-    _T("[Bionic]"),
-    _T("[LSD7c]"),
-    _T("[0x8d] unknown Leecher - (client version:60)"),
-    _T("[RAMMSTEIN]"),
-    _T("[MD5 Community]"),
-    _T("[new DarkMule]"),
-    _T("[OMEGA v.07 Heiko]"),
-    _T("[eMule v0.26 Leecher]"),
-    _T("[Hunter]"),
-    _T("[Bionic 0.20 Beta]"),
-    _T("[Rumata (rus)(Plus v1f)]"),
-    _T("[Fusspi]"),
-    _T("[donkey2002]"),
-    _T("[md4]"),
-    _T("[SpeedMule]"),
-    _T("[pimp]"),
-    _T("[Chinese Leecher]") // SquallATF
-                            //,_T("[eChanblardNext]") // zz_fly
-};
-
 bool IsTypicalHex(const CString &addon) {
   int n = addon.GetLength();
   if (n < 5 || n > 25)
@@ -76,17 +50,15 @@ bool IsTypicalHex(const CString &addon) {
   bool smallalpha = false;
   bool numeric = false;
 
+  // clang-format off
   while (--n) {
     const TCHAR c = addon.GetAt(n);
-    /**/ if (c >= _T('0') && c <= _T('9'))
-      numeric = true;
-    else if (c >= _T('A') && c <= _T('F'))
-      bigalpha = true;
-    else if (c >= _T('a') && c <= _T('f'))
-      smallalpha = true;
-    else
-      return false;
+    /**/ if (c >= _T('0') && c <= _T('9')) numeric = true;
+    else if (c >= _T('A') && c <= _T('F')) bigalpha = true;
+    else if (c >= _T('a') && c <= _T('f')) smallalpha = true;
+    else return false;
   }
+  // clang-format on
 
   return numeric && (bigalpha != smallalpha);
 }
@@ -157,6 +129,10 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Hard(LPCTSTR modversion,
       return _T("Bad MODSTRING");
   }
 
+  if (IS_SPACE(modversion)) {
+    return _T("Bad MODSTRING");
+  }
+
   return NULL;
 }
 
@@ -194,6 +170,10 @@ LPCTSTR CantiLeech__ DLPCheckUsername_Hard(LPCTSTR username) {
   for (size_t i = 0; i < denylist.size; ++i) {
     if (denylist.check(username, denylist.data[i]))
       return _T("Bad USERNAME");
+  }
+
+  if (IS_SPACE(username)) {
+    return _T("Bad USERNAME");
   }
 
   // new ketamine
@@ -258,88 +238,39 @@ LPCTSTR CantiLeech__ DLPCheckNameAndHashAndMod(
     const CString &username, const CString &userhash, const CString &modversion
 #endif
 ) {
-  if (username.IsEmpty() || userhash.IsEmpty())
+  if (username.IsEmpty() || userhash.IsEmpty()) {
     return NULL;
+  }
 
-  // community userhash check
-  static const TCHAR refuserhash0[] =
-      _T("154CE646120E96CC798C439A20D26F8D"); // (windows ue)
-  static const TCHAR refuserhash1[] =
-      _T("455361F9D95C3CD7E6BF2192D1CB3D02"); // (windows ue)
-  static const TCHAR refuserhash2[] = _T("C8B5F41441C615FBABAD9A7E55294D01");
-  static const TCHAR refuserhash6[] =
-      _T("A2221641460E961C8B7FF21A53FB6F6C"); //**Riso64Bit**
-  static const TCHAR refuserhash7[] =
-      _T("888F4742450EF75F9DD8B7E53FA06FF0"); //**Riso64Bit**
-  static const TCHAR refuserhash8[] =
-      _T("0B76CC42CB0E81B0DC6120D2BCB36FF9"); //**Riso64Bit**
-  static const TCHAR refuserhash9[] =
-      _T("EAA383FD9E0E68538C7AC8AD15526F7A"); //**Riso64Bit**
-  static const TCHAR refuserhash10[] =
-      _T("65C3B2E8940E582630A7F58AF9F26F9E"); // from TaiWan
-  static const TCHAR refuserhash11[] =
-      _T("9BA09B83DC0EE78BE20280C387936F00"); // from SS1900
-  static const TCHAR refuserhash12[] =
-      _T("C92859E4860EA0F15F7837750C886FB6"); // from SS1900
-  static const TCHAR refuserhash13[] =
-      _T("CB42F563EE0EA7907395420CAC146FF5"); // From "qobfxb" multi user
-                                              // [DargonD]
+  static const LPCTSTR community_userhash_list[] = {
+      // clang-format off
+      _T("154CE646120E96CC798C439A20D26F8D"), // (windows ue)
+      _T("455361F9D95C3CD7E6BF2192D1CB3D02"), // (windows ue)
+      _T("C8B5F41441C615FBABAD9A7E55294D01"),
+      _T("A2221641460E961C8B7FF21A53FB6F6C"), //**Riso64Bit**
+      _T("888F4742450EF75F9DD8B7E53FA06FF0"), //**Riso64Bit**
+      _T("0B76CC42CB0E81B0DC6120D2BCB36FF9"), //**Riso64Bit**
+      _T("EAA383FD9E0E68538C7AC8AD15526F7A"), //**Riso64Bit**
+      _T("65C3B2E8940E582630A7F58AF9F26F9E"), // from TaiWan
+      _T("9BA09B83DC0EE78BE20280C387936F00"), // from SS1900
+      _T("C92859E4860EA0F15F7837750C886FB6"), // from SS1900
+      _T("CB42F563EE0EA7907395420CAC146FF5"), // From "qobfxb" multi user
+      // clang-format on
+  };
+  for (int i = 0; i < ARRAY_COUNT(community_userhash_list); ++i) {
+    if (STRICMP(userhash, community_userhash_list[i]) == 0)
+      return _T("Community Userhash");
+  }
 
-  // SDC fixed
-#if defined(SPECIAL_DLP_VERSION)
-  if (STRICMP(userhash, refuserhash0) == 0 ||
-      STRICMP(userhash, refuserhash1) == 0 ||
-      STRICMP(userhash, refuserhash2) == 0 ||
-      STRICMP(userhash, refuserhash6) == 0 ||
-      STRICMP(userhash, refuserhash7) == 0 ||
-      STRICMP(userhash, refuserhash8) == 0 ||
-      STRICMP(userhash, refuserhash9) == 0 ||
-      STRICMP(userhash, refuserhash10) == 0 ||
-      STRICMP(userhash, refuserhash11) == 0 ||
-      STRICMP(userhash, refuserhash12) == 0 ||
-      // The official refuserhash13 with NickName "qobfxb" will be checked in
-      // DLPCheckUsername_Hard function.
-      (!STRSTR(username, _T("qobfxb")) &&
-       STRICMP(userhash, refuserhash13) == 0))
-    return _T("[SDC] Community UserHash");
-#else // Official
-  if (STRICMP(userhash, refuserhash0) == 0 ||
-      STRICMP(userhash, refuserhash1) == 0 ||
-      STRICMP(userhash, refuserhash2) == 0 ||
-      STRICMP(userhash, refuserhash6) == 0 ||
-      STRICMP(userhash, refuserhash7) == 0 ||
-      STRICMP(userhash, refuserhash8) == 0 ||
-      STRICMP(userhash, refuserhash9) == 0 ||
-      STRICMP(userhash, refuserhash10) == 0 ||
-      STRICMP(userhash, refuserhash11) == 0 ||
-      STRICMP(userhash, refuserhash12) == 0 ||
-      STRICMP(userhash, refuserhash13) == 0)
-    return _T("Community Userhash");
-#endif
-
-  // corrupt userhash check
-  static const TCHAR refuserhash3[] = _T("00000000000E00000000000000006F00");
-  static const TCHAR refuserhash4[] = _T("FE000000000E00000000000000006F00");
-  if (STRICMP(userhash, refuserhash3) == 0 ||
-      STRICMP(userhash, refuserhash4) == 0)
-    return _T("Corrupt UserHash");
-
-    // SDC fixed
-    // Community Userhash check, thanks SquallATF.
-#if defined(SPECIAL_DLP_VERSION)
-  static const TCHAR RefUserHash_5[] = _T("DA1CEEE05B0E5319B3B48CAED24C6F4A");
-  if (!STRSTR(username, _T("QQDownload")) &&
-      STRICMP(userhash, RefUserHash_5) ==
-          0) // The official refuserhash5 with NickName "QQDownload" will be
-             // checked in DLPCheckUsername_Hard function.
-    return _T("[SDC] Bad UserHash");
-#else // Official
-  static const TCHAR refuserhash5[] = _T("DA1CEEE05B0E5319B3B48CAED24C6F4A");
-  if (STRICMP(userhash, refuserhash5) == 0)
-    return _T("Bad Userhash");
-#endif
-
-  // zz_fly End
+  static const LPCTSTR corrupt_userhash_list[] = {
+      _T("00000000000E00000000000000006F00"),
+      _T("FE000000000E00000000000000006F00"),
+      _T("DA1CEEE05B0E5319B3B48CAED24C6F4A"),
+  };
+  for (int i = 0; i < ARRAY_COUNT(community_userhash_list); ++i) {
+    if (STRICMP(userhash, corrupt_userhash_list[i]) == 0)
+      return _T("Corrupt UserHash");
+  }
 
   // Check for aedit
   // remark: a unmodded emule can't send a space at last sign
@@ -352,42 +283,14 @@ LPCTSTR CantiLeech__ DLPCheckNameAndHashAndMod(
 
   // community check
   if (username.GetLength() >= 7 && username.Right(1) == _T("]")) {
-    /* no more needed
-    //check for gamer
-    //two checks should be enough.
-    if(username.Right(6).Left(1)==userhash.Mid(5,1)
-    && username.Right(3).Left(1)==userhash.Mid(7,1)
-    )
-    return _T("old united");
-    */
-
     // check for special nickaddon
     int find = username.ReverseFind(_T('['));
     if (find >= 0) {
       CString addon = username.Mid(find + 1);
       // int endpos=addon.GetLength()-1;
       if (addon.GetLength() > 2) {
-        // check for snake //12/2006
-        /* no more needed, better detection inside Xtreme
-           for(int i=0; i<endpos;i++)
-           {
-           if( !(addon.GetAt(i)>=_T('0') && addon.GetAt(i)<=_T('9')) )
-           {
-           i=endpos+1;
-           }
-           }
-           if(i==endpos)
-           return _T("Snake");
-        */
-
         // Chek for Hex (e.g. X-Treme)
-        // SDC fixed
-#if defined(SPECIAL_DLP_VERSION)
-        auto AddonLeft = addon.Left(addon.GetLength() - 1);
-        if (IsTypicalHex(AddonLeft))
-#else // Official
         if (IsTypicalHex(addon.Left(addon.GetLength() - 1)))
-#endif
           return _T("Hex-Code-Addon");
       }
       // zz_fly :: start
@@ -414,7 +317,7 @@ LPCTSTR CantiLeech__ DLPCheckNameAndHashAndMod(
         if (bFoundRandomPadding &&
             (username.Find(_T("Silver Surfer User")) == 0) &&
             (modversion.Find(_T("Silver")) == -1))
-          return _T("Fake Silver Surfer"); //**Riso64Bit** :: fake silver
+          return _T("Fake Silver Surfer"); // **Riso64Bit** :: fake silver
                                            // surfer
       }
       // zz_fly :: end
@@ -423,157 +326,138 @@ LPCTSTR CantiLeech__ DLPCheckNameAndHashAndMod(
 
   // thx cyrex
   if (modversion.GetLength() == 10 && username.GetLength() > 4 &&
-      STRSTR(username.Right(4), _T("/]")) && STRSTR(username, _T("[SE]")))
+      STRSTR(username.Right(4), _T("/]")) && STRSTR(username, _T("[SE]"))) {
     return _T("Mystery ModString");
-
-    // Add by SDC team.
-#if defined(SPECIAL_DLP_VERSION)
-  // Some Community UserHash check
-  static const TCHAR SDC_RefUserHash_1[] =
-      _T("66B002DADE0E6DBEDF4FCCAA380E6FD4"); // From multi user (TW&CN)
-                                              // [DargonD]
-  static const TCHAR SDC_RefUserHash_2[] =
-      _T("AAEE84C0C30E247CBB99B459255D6F99"); // From NAS_01G multi user
-                                              // [DargonD]
-  static const TCHAR SDC_RefUserHash_3[] =
-      _T("5E02F74DBA0E8A19DBF6733F0AE66F4A"); // Community UserHash
-                                              // [FzH/DargonD]
-  static const TCHAR SDC_RefUserHash_4[] =
-      _T("B6491292AE0E07AC8C6045CAC2DD6F9F"); // Community UserHash
-                                              // [FzH/DargonD]
-  static const TCHAR SDC_RefUserHash_5[] =
-      _T("596B305E050EA842CE38DF3811216F3F"); // Community UserHash
-                                              // [FzH/DargonD]
-  static const TCHAR SDC_RefUserHash_6[] =
-      _T("B1798B2F620E0B676452C6E2EF706F13"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_7[] =
-      _T("C1533316C00E3E0D0218843A05E46FAC"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_8[] =
-      _T("FE10F3C0610E0A925B85204CE8456F42"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_9[] =
-      _T("C9E61DEEF30E0360E2741C9CF1396F94"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_10[] =
-      _T("559ACC89D80E90C50A7A0CD3224F6F57"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_11[] =
-      _T("6AE1D2DF4B0E8707B6F6BC29E8746F0F"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_12[] =
-      _T("8A537F20B80EF9AF02E59E6C087C6F6B"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_13[] =
-      _T("3F44A7996F0E17D1F4B319EB58B26F64"); // Invalid UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_14[] =
-      _T("D0D897BD360EEFF329903E04990B6F86"); // Xunlei
-  static const TCHAR SDC_RefUserHash_15[] =
-      _T("36725093E00E9350F7680C871E946FD1"); // Tencent Offline Download
-                                              // Server UserHash [DargonD]
-  static const TCHAR SDC_RefUserHash_16[] =
-      _T("769D36987E0E313A1501967D0F146F7A"); // UserHash of Xunlei Offline
-                                              // Download Server and Moblie
-                                              // System Apps [pandaleo]
-  if (STRICMP(userhash, SDC_RefUserHash_1) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_2) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_3) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_4) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_5) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_6) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_7) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_8) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_9) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_10) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_11) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_12) == 0 ||
-      STRICMP(userhash, SDC_RefUserHash_13) == 0 ||
-      (!STRSTR(modversion, _T("xl build")) &&
-       STRICMP(userhash, SDC_RefUserHash_14) ==
-           0) || // The SDC_RefUserHash_14 with modstring "xl build" will be
-                 // checked in DLPCheckModstring_Hard function.
-      (!STRSTR(username, _T("[CHN][VeryCD]QQ")) &&
-       STRICMP(userhash, SDC_RefUserHash_15) ==
-           0) || // The SDC_RefUserHash_15 with NickName "[CHN][VeryCD]QQ" will
-                 // be checked in DLPCheckUsername_Hard function.
-      (!STRSTR(username, _T("[CHN]shaohan")) &&
-       STRICMP(userhash, SDC_RefUserHash_16) ==
-           0)) // The SDC_RefUserHash_16 with NickName "[CHN]shaohan" will be
-               // checked in DLPCheckUsername_Hard function.
-    return _T("[SDC] Community UserHash");
-#endif
-
-  if (modversion.IsEmpty())
-    return NULL;
-
-#define NUMBERSOFSTRING 9
-  static const CString testModString[] = {_T("Xtreme"),
-                                          _T("ScarAngel"),
-                                          _T("Mephisto"),
-                                          _T("MorphXT"),
-                                          _T("EastShare"),
-                                          _T("StulleMule"),
-                                          /*_T("Magic Angel"),*/ _T("DreaMule"),
-                                          _T("X-Mod"),
-                                          _T("RaJiL")};
-  static const float testMinVer[] = {4.4f, 2.5f,           1.5f, 10.0f, 13.0f,
-                                     6.0f, /*3.0f,*/ 3.0f, 0.0f, 2.2f};
-  for (int i = 0; i < NUMBERSOFSTRING; i++) {
-    bool tag1 = (username.Find(_T('«') + testModString[i]) != -1);
-    if (modversion.Find(testModString[i]) != -1) {
-      float version = STRTOF(modversion.Right(4), NULL);
-      if (!tag1 && ((testMinVer[i] == 0.0f) || (version == 9.7f) ||
-                    (version >= testMinVer[i])))
-        return _T("ModString Thief");
-    } else if (tag1)
-      return _T("ModString Thief");
   }
 
-  // doubled  «...» in the username, like "username «Xtreme #.#» «abcd»"
-  int posr1 = username.Find(_T('»'));
-  int posr2 = username.ReverseFind(_T('»'));
-  if ((posr1 > 5) && (posr2 - posr1 > 5) &&
-      ((username.GetAt(posr1 - 5) == _T('«')) ||
-       (username.GetAt(posr2 - 5) == _T('«'))))
-    return _T("Bad Username Paddings");
-  // zz_fly :: end
+  // Add by SDC team.
+#if defined(SPECIAL_DLP_VERSION)
+  // clang-format off
+  // Some Community UserHash check
+  static const LPCTSTR SDC_RefUserHash_list[] = {
+    _T("66B002DADE0E6DBEDF4FCCAA380E6FD4"), // From multi user (TW&CN) [DargonD]
+    _T("AAEE84C0C30E247CBB99B459255D6F99"), // From NAS_01G multi user [DargonD]
+    _T("5E02F74DBA0E8A19DBF6733F0AE66F4A"), // Community UserHash [FzH/DargonD]
+    _T("B6491292AE0E07AC8C6045CAC2DD6F9F"), // Community UserHash [FzH/DargonD]
+    _T("596B305E050EA842CE38DF3811216F3F"), // Community UserHash [FzH/DargonD]
+    _T("B1798B2F620E0B676452C6E2EF706F13"), // Invalid UserHash [DargonD]
+    _T("C1533316C00E3E0D0218843A05E46FAC"), // Invalid UserHash [DargonD]
+    _T("FE10F3C0610E0A925B85204CE8456F42"), // Invalid UserHash [DargonD]
+    _T("C9E61DEEF30E0360E2741C9CF1396F94"), // Invalid UserHash [DargonD]
+    _T("559ACC89D80E90C50A7A0CD3224F6F57"), // Invalid UserHash [DargonD]
+    _T("6AE1D2DF4B0E8707B6F6BC29E8746F0F"), // Invalid UserHash [DargonD]
+    _T("8A537F20B80EF9AF02E59E6C087C6F6B"), // Invalid UserHash [DargonD]
+    _T("3F44A7996F0E17D1F4B319EB58B26F64"), // Invalid UserHash [DargonD]
+  };
+  // clang-forma on
+  for (int i = 0; i < ARRAY_COUNT(SDC_RefUserHash_list); ++i) {
+    if (STRICMP(userhash, SDC_RefUserHash_list[i]) == 0)
+      return _T("[SDC] Community UserHash");
+  }
+
+  // clang-forma off
+  if (
+          // The SDC_RefUserHash_14 with modstring "xl build" will be checked in
+          // DLPCheckModstring_Hard function.
+          (STRSTR(modversion, _T("xl build")) == NULL &&
+           STRICMP(userhash, _T("D0D897BD360EEFF329903E04990B6F86")) == 0) ||
+          // The SDC_RefUserHash_15 with NickName "[CHN][VeryCD]QQ" will be checked
+          // in DLPCheckUsername_Hard function.
+          (STRSTR(username, _T("[CHN][VeryCD]QQ")) == NULL &&
+           STRICMP(userhash, _T("36725093E00E9350F7680C871E946FD1")) == 0) ||
+          // The SDC_RefUserHash_16 with NickName "[CHN]shaohan" will be checked in
+          // DLPCheckUsername_Hard function.
+          (STRSTR(username, _T("[CHN]shaohan")) == NULL &&
+           STRICMP(userhash, _T("769D36987E0E313A1501967D0F146F7A")) == 0)
+      ) {
+    return _T("[SDC] Community UserHash");
+  }
+  // clang-forma on
+#endif // SPECIAL_DLP_VERSION
+
+  if (modversion.IsEmpty()) {
+    return NULL;
+  }
+  static const std::pair<LPCTSTR, float> modString_minVer_list[] = {
+    {_T("«Xtreme"), 4.4f},
+    {_T("«ScarAngel"), 2.5f},
+    {_T("«Mephisto"), 1.5f},
+    {_T("«MorphXT"), 10.0f},
+    {_T("«EastShare"), 13.0f},
+    {_T("«StulleMule"), 6.0f},
+    // {_T("«Magic Angel"),  3.0f},
+    {_T("«DreaMule"), 3.0f},
+    {_T("«X-Mod"), 0.0f},
+    {_T("«RaJiL"), 2.2f},
+  };
+  for (int i = 0; i < ARRAY_COUNT(modString_minVer_list); ++i) {
+    LPCTSTR tag = STRSTR(username, modString_minVer_list[i].first);
+    if (!tag && STRSTR(modversion, modString_minVer_list[i].first)) {
+      const float version = STRTOF(modversion.Right(4), NULL);
+      if (modString_minVer_list[i].second == 0.0f || version == 9.7f ||
+          version >= modString_minVer_list[i].second) {
+        return _T("ModString Thief");
+      }
+    } else if (tag) {
+      return _T("ModString Thief");
+    }
+  }
+
+  {
+    // doubled  «...» in the username, like "username «Xtreme #.#» «abcd»"
+    LPCTSTR p1, p2;
+    if ((p1 = STRSTR(username, _T("«"))) && (p2 = STRSTR(p1 + 1, _T("«")))) {
+      if (((p1 = STRSTR(p1 + 1, _T("»"))) && (p1 < p2)) && STRSTR(p2 + 1, _T("»"))) {
+        return _T("Bad Username Paddings");
+      }
+    }
+  }
 
   return NULL;
 }
 
 LPCTSTR CantiLeech__ DLPCheckMessageSpam(LPCTSTR messagetext) {
-  if (messagetext == NULL)
+  if (messagetext == NULL) {
     return NULL;
+  }
 
-  if (STRSTR(messagetext, _T("ZamBoR")) ||
-      STRSTR(messagetext, _T("DI-Emule")) ||
-      STRSTR(messagetext, _T("Join the L33cher")) ||
-      STRSTR(messagetext, _T("eMule FX")) ||
-      STRSTR(messagetext, _T("---> ed2k://|file|Ketamine")) ||
-      STRSTR(messagetext, _T("robot from RIAA, you can't fight")) ||
-      STRSTR(messagetext,
-             _T("agent from PeerFactor, she advises you to stop")) ||
-      STRSTR(messagetext,
-             _T("bot from MPAA, you can't do anything against her")) ||
-      STRSTR(messagetext, _T("[Sangue-Suga]")) || // 3 /2007
-      STRSTR(messagetext, _T("[te@m projekt")) || // 5 /2007
-      STRSTR(messagetext,
-             _T("eMule PRO Ultra")) ||        // 8/2007 //include ultra 1 2 3
-      STRSTR(messagetext, _T("HyperMule")) || // 8/2007
-      STRSTR(messagetext, _T("FXeMule")) ||
-      STRSTR(messagetext, _T("angelmule.com")) || //**Riso64Bit**
-      STRSTR(messagetext, _T("RocketMule"))       //**Riso64Bit**
-  )
+  if (IS_SPACE(messagetext)) {
     return (_T("Spam-Message"));
+  }
 
-  if (CString(messagetext).Trim().IsEmpty())
-    return (_T("Spam-Message"));
+  static const LPCTSTR spam_message_list[] = {
+      _T("ZamBoR"),
+      _T("DI-Emule"),
+      _T("Join the L33cher"),
+      _T("eMule FX"),
+      _T("---> ed2k://|file|Ketamine"),
+      _T("robot from RIAA, you can't fight"),
+      _T("agent from PeerFactor, she advises you to stop"),
+      _T("bot from MPAA, you can't do anything against her"),
+      _T("[Sangue-Suga]"),   // 3 /2007
+      _T("[te@m projekt"),   // 5 /2007
+      _T("eMule PRO Ultra"), // 8/2007 //include ultra 1 2 3
+      _T("HyperMule"),       // 8/2007
+      _T("FXeMule"),
+      _T("angelmule.com"), //**Riso64Bit**
+      _T("RocketMule"),    //**Riso64Bit**
+  };
+  for (int i = 0; i < ARRAY_COUNT(spam_message_list); ++i) {
+    if (STRCMP(messagetext, spam_message_list[i]) == 0)
+      return _T("Spam-Message");
+  }
 
   return NULL;
 }
 
+// clang-forma off
 //<<< new tags from eMule 0.04x
 enum {
   CT_UNKNOWNx0 = 0x00,  // Hybrid Horde protocol
   CT_UNKNOWNx12 = 0x12, // http://www.haspepapa-welt.de (DodgeBoards)
   CT_UNKNOWNx13 = 0x13, // http://www.haspepapa-welt.de (DodgeBoards)
   CT_UNKNOWNx14 = 0x14, // http://www.haspepapa-welt.de (DodgeBoards)
-  CT_UNKNOWNx15 =
-      0x15, // http://www.haspepapa-welt.de (DodgeBoards) & DarkMule |eVorte|X|
+  CT_UNKNOWNx15 = 0x15, // http://www.haspepapa-welt.de (DodgeBoards) & DarkMule |eVorte|X|
   CT_UNKNOWNx16 = 0x16, // http://www.haspepapa-welt.de (DodgeBoards)
   CT_UNKNOWNx17 = 0x17, // http://www.haspepapa-welt.de (DodgeBoards)
   CT_UNKNOWNx4D = 0x4D, // pimp my mule (00de)
@@ -611,104 +495,95 @@ enum {
   CT_UNKNOWNxF0 = 0xF0, // Emulereactor Community Mod
   CT_UNKNOWNxF4 = 0xF4, // Emulereactor Community Mod
   CT_UNKNOWNxD2 = 0xD2, // Chinese Leecher //SquallATF
-  // CT_UNKNOWNx85 = 0x85, // viper-israel.org and eChanblardNext  //zz_fly,
-  // viper become good
+  // CT_UNKNOWNx85 = 0x85, // viper-israel.org and eChanblardNext  //zz_fly, viper become good
   CT_FRIENDSHARING = 0x66, // eWombat  [SNAFU]
   CT_DARK = 0x54,          // eWombat [SNAFU]
 };
+// clang-forma on
+
+// clang-format off
+namespace { namespace p__ {
+//>>> eWombat [SNAFU_V3]
+static const LPCTSTR apszSnafuTag[] = {
+  _T("[DodgeBoards]"),
+  _T("[DodgeBoards & DarkMule eVorteX]"),
+  _T("[DarkMule v6 eVorteX]"),
+  _T("[eMuleReactor]"),
+  _T("[Bionic]"),
+  _T("[LSD7c]"),
+  _T("[0x8d] unknown Leecher - (client version:60)"),
+  _T("[RAMMSTEIN]"),
+  _T("[MD5 Community]"),
+  _T("[new DarkMule]"),
+  _T("[OMEGA v.07 Heiko]"),
+  _T("[eMule v0.26 Leecher]"),
+  _T("[Hunter]"),
+  _T("[Bionic 0.20 Beta]"),
+  _T("[Rumata (rus)(Plus v1f)]"),
+  _T("[Fusspi]"),
+  _T("[donkey2002]"),
+  _T("[md4]"),
+  _T("[SpeedMule]"),
+  _T("[pimp]"),
+  _T("[Chinese Leecher]"), // SquallATF
+  // _T("[eChanblardNext]"), // zz_fly
+};
+} } // namespace{namespace p__{
+// clang-format on
 
 LPCTSTR CantiLeech__ DLPCheckHelloTag(UINT tagnumber) {
+  using p__::apszSnafuTag;
   LPCTSTR strSnafuTag = NULL;
+  // clang-format off
   switch (tagnumber) {
-  case CT_UNKNOWNx12:
-  case CT_UNKNOWNx13:
-  case CT_UNKNOWNx14:
-  case CT_UNKNOWNx16:
-  case CT_UNKNOWNx17:
-  case CT_UNKNOWNxE6:
-    strSnafuTag = apszSnafuTag[0];
-    break; // buffer=_T("DodgeBoards");break;
-  case CT_UNKNOWNx15:
-    strSnafuTag = apszSnafuTag[1];
-    break; // buffer=_T("DodgeBoards & DarkMule |eVorte|X|");break;
-  case CT_UNKNOWNx22:
-    strSnafuTag = apszSnafuTag[2];
-    break; // buffer=_T("DarkMule v6 |eVorte|X|");break;
-  case CT_UNKNOWNx5D:
-  case CT_UNKNOWNx6B:
-  case CT_UNKNOWNx6C:
-    strSnafuTag = apszSnafuTag[17];
-    break;
-  case CT_UNKNOWNx74:
-  case CT_UNKNOWNx87:
-    strSnafuTag = apszSnafuTag[17];
-    break;
-  case CT_UNKNOWNxF0:
-  case CT_UNKNOWNxF4:
-    strSnafuTag = apszSnafuTag[17];
-    break;
-    // case CT_UNKNOWNx69:
-    // strSnafuTag=apszSnafuTag[3];break;//buffer=_T("eMuleReactor");break;
-  case CT_UNKNOWNx79:
-    strSnafuTag = apszSnafuTag[4];
-    break; // buffer=_T("Bionic");break;
-  case CT_UNKNOWNx83:
-    strSnafuTag = apszSnafuTag[15];
-    break; // buffer=_T("Fusspi");break;
-  case CT_UNKNOWNx76:
-  case CT_UNKNOWNxCD:
-    strSnafuTag = apszSnafuTag[16];
-    break; // buffer=_T("www.donkey2002.to");break;
-  case CT_UNKNOWNx88:
-    strSnafuTag = apszSnafuTag[5]; //[LSD7c]
-    break;
-  case CT_UNKNOWNx8c:
-    strSnafuTag = apszSnafuTag[5];
-    break; // buffer=_T("[LSD7c]");break;
-  case CT_UNKNOWNx8d:
-    strSnafuTag = apszSnafuTag[6];
-    break; // buffer=_T("[0x8d] unknown Leecher - (client
-           // version:60)");break;
-  case CT_UNKNOWNx99:
-    strSnafuTag = apszSnafuTag[7];
-    break; // buffer=_T("[RAMMSTEIN]");break; //STRIKE BACK
-  case CT_UNKNOWNx97:
-  case CT_UNKNOWNx98:
-  case CT_UNKNOWNx9C:
-  case CT_UNKNOWNxDA:
-    strSnafuTag = apszSnafuTag[3];
-    break;            // buffer=_T("eMuleReactor");break;
-  case CT_UNKNOWNxC8: // Xman x4
-  case CT_UNKNOWNxCE: // Xman 20.08.05
-  case CT_UNKNOWNxCF: // Xman 20.08.05
-  case CT_UNKNOWNx94: // Xman 20.08.05
-  case CT_UNKNOWNxc4:
-    strSnafuTag = apszSnafuTag[8];
-    break; // buffer=_T("[MD5 Community]");break;	//USED BY NEW BIONIC =>
-           // 0x12 Sender
-  case CT_UNKNOWNxEC:
-    strSnafuTag = apszSnafuTag[18];
-    break; // Xman x4 Speedmule
-    // case CT_FRIENDSHARING: //STRIKE BACK
-    // break;
-  case CT_DARK: // STRIKE BACK
-  case CT_UNKNOWNx7A:
-  case CT_UNKNOWNxCA:
-    strSnafuTag = apszSnafuTag[9];
-    break; // buffer=_T("new DarkMule");
-  case CT_UNKNOWNx4D:
-    strSnafuTag = apszSnafuTag[19];
-    break; // pimp my mule misuse an official tag in hello
-  case CT_UNKNOWNxD2:
-    strSnafuTag = apszSnafuTag[20];
-    break; // SquallATF
-           // case CT_UNKNOWNx85:
-           //	strSnafuTag=apszSnafuTag[21];break;//zz_fly
+    case CT_UNKNOWNx12:
+    case CT_UNKNOWNx13:
+    case CT_UNKNOWNx14:
+    case CT_UNKNOWNx16:
+    case CT_UNKNOWNx17:
+    case CT_UNKNOWNxE6: strSnafuTag = apszSnafuTag[0]; break;
+    case CT_UNKNOWNx15: strSnafuTag = apszSnafuTag[1]; break;
+    case CT_UNKNOWNx22: strSnafuTag = apszSnafuTag[2]; break;
+    case CT_UNKNOWNx5D:
+    case CT_UNKNOWNx6B:
+    case CT_UNKNOWNx6C: strSnafuTag = apszSnafuTag[17]; break;
+    case CT_UNKNOWNx74:
+    case CT_UNKNOWNx87: strSnafuTag = apszSnafuTag[17]; break;
+    case CT_UNKNOWNxF0:
+    case CT_UNKNOWNxF4: strSnafuTag = apszSnafuTag[17]; break;
+      // case CT_UNKNOWNx69: strSnafuTag=apszSnafuTag[3]; break;
+    case CT_UNKNOWNx79: strSnafuTag = apszSnafuTag[4]; break;
+    case CT_UNKNOWNx83: strSnafuTag = apszSnafuTag[15]; break;
+    case CT_UNKNOWNx76:
+    case CT_UNKNOWNxCD: strSnafuTag = apszSnafuTag[16]; break;
+    case CT_UNKNOWNx88: strSnafuTag = apszSnafuTag[5]; break;
+    case CT_UNKNOWNx8c: strSnafuTag = apszSnafuTag[5]; break;
+    case CT_UNKNOWNx8d: strSnafuTag = apszSnafuTag[6]; break;
+    case CT_UNKNOWNx99: strSnafuTag = apszSnafuTag[7]; break;
+    case CT_UNKNOWNx97:
+    case CT_UNKNOWNx98:
+    case CT_UNKNOWNx9C:
+    case CT_UNKNOWNxDA: strSnafuTag = apszSnafuTag[3]; break;
+    case CT_UNKNOWNxC8: // Xman x4
+    case CT_UNKNOWNxCE: // Xman 20.08.05
+    case CT_UNKNOWNxCF: // Xman 20.08.05
+    case CT_UNKNOWNx94: // Xman 20.08.05
+    case CT_UNKNOWNxc4: strSnafuTag = apszSnafuTag[8]; break; // USED BY NEW BIONIC => 0x12 Sender
+    case CT_UNKNOWNxEC: strSnafuTag = apszSnafuTag[18]; break; // Xman x4 Speedmule
+      // case CT_FRIENDSHARING: break;
+    case CT_DARK: // STRIKE BACK
+    case CT_UNKNOWNx7A:
+    case CT_UNKNOWNxCA: strSnafuTag = apszSnafuTag[9]; break;
+    case CT_UNKNOWNx4D: strSnafuTag = apszSnafuTag[19]; break; // pimp my mule misuse an official tag in hello
+    case CT_UNKNOWNxD2: strSnafuTag = apszSnafuTag[20]; break; // SquallATF
+      // case CT_UNKNOWNx85: strSnafuTag=apszSnafuTag[21]; break; //zz_fly
+    default: break;
   }
-
+  // clang-format on
   return strSnafuTag;
 }
 
+// clang-forma off
 // unknown eMule tags
 enum {
   ET_MOD_UNKNOWNx12 = 0x12, // http://www.haspepapa-welt.de
@@ -742,42 +617,31 @@ enum {
   ET_MOD_UNKNOWNxC9 = 0xC9, // Bionic 0.20 Beta]
   ET_MOD_UNKNOWNxDA = 0xDA, // Rumata (rus)(Plus v1f) - leecher mod?
 };
+// clang-forma on
 
 LPCTSTR CantiLeech__ DLPCheckInfoTag(UINT tagnumber) {
+  using p__::apszSnafuTag;
   LPCTSTR strSnafuTag = NULL;
-
+  // clang-format off
   switch (tagnumber) {
-  case ET_MOD_UNKNOWNx12:
-  case ET_MOD_UNKNOWNx13:
-  case ET_MOD_UNKNOWNx14:
-  case ET_MOD_UNKNOWNx17:
-    strSnafuTag = apszSnafuTag[0];
-    break; //("[DodgeBoards]")
-  case ET_MOD_UNKNOWNx2F:
-    strSnafuTag = apszSnafuTag[10];
-    break; // buffer=_T("[OMEGA v.07 Heiko]");break;
-  case ET_MOD_UNKNOWNx36:
-  case ET_MOD_UNKNOWNx5B:
-  case ET_MOD_UNKNOWNxA6:
-    strSnafuTag = apszSnafuTag[11];
-    break; // buffer=_T("eMule v0.26 Leecher");break;
-  case ET_MOD_UNKNOWNx60:
-    strSnafuTag = apszSnafuTag[12];
-    break; // buffer=_T("[Hunter]");break; //STRIKE BACK
-  case ET_MOD_UNKNOWNx76:
-    strSnafuTag = apszSnafuTag[0];
-    break; // buffer=_T("[DodgeBoards]");break;
-  case ET_MOD_UNKNOWNx50:
-  case ET_MOD_UNKNOWNxB1:
-  case ET_MOD_UNKNOWNxB4:
-  case ET_MOD_UNKNOWNxC8:
-  case ET_MOD_UNKNOWNxC9:
-    strSnafuTag = apszSnafuTag[13];
-    break; // buffer=_T("[Bionic 0.20 Beta]");break;
-  case ET_MOD_UNKNOWNxDA:
-    strSnafuTag = apszSnafuTag[14];
-    break; // buffer=_T("[Rumata (rus)(Plus v1f)]");break;
+    case ET_MOD_UNKNOWNx12:
+    case ET_MOD_UNKNOWNx13:
+    case ET_MOD_UNKNOWNx14:
+    case ET_MOD_UNKNOWNx17: strSnafuTag = apszSnafuTag[0]; break; 
+    case ET_MOD_UNKNOWNx2F: strSnafuTag = apszSnafuTag[10]; break;
+    case ET_MOD_UNKNOWNx36:
+    case ET_MOD_UNKNOWNx5B:
+    case ET_MOD_UNKNOWNxA6: strSnafuTag = apszSnafuTag[11]; break;
+    case ET_MOD_UNKNOWNx60: strSnafuTag = apszSnafuTag[12]; break;
+    case ET_MOD_UNKNOWNx76: strSnafuTag = apszSnafuTag[0]; break;
+    case ET_MOD_UNKNOWNx50:
+    case ET_MOD_UNKNOWNxB1:
+    case ET_MOD_UNKNOWNxB4:
+    case ET_MOD_UNKNOWNxC8:
+    case ET_MOD_UNKNOWNxC9: strSnafuTag = apszSnafuTag[13]; break;
+    case ET_MOD_UNKNOWNxDA: strSnafuTag = apszSnafuTag[14]; break;
+    default: break;
   }
-
+  // clang-format on
   return strSnafuTag;
 }

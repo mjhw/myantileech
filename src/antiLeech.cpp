@@ -627,7 +627,7 @@ LPCTSTR CantiLeech__ DLPCheckInfoTag(UINT tagnumber) {
     case ET_MOD_UNKNOWNx12:
     case ET_MOD_UNKNOWNx13:
     case ET_MOD_UNKNOWNx14:
-    case ET_MOD_UNKNOWNx17: strSnafuTag = apszSnafuTag[0]; break; 
+    case ET_MOD_UNKNOWNx17: strSnafuTag = apszSnafuTag[0]; break;
     case ET_MOD_UNKNOWNx2F: strSnafuTag = apszSnafuTag[10]; break;
     case ET_MOD_UNKNOWNx36:
     case ET_MOD_UNKNOWNx5B:

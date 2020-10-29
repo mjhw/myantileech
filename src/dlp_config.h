@@ -2,6 +2,7 @@
 #ifndef DLP_ONCE__DLP_CONFIG
 #define DLP_ONCE__DLP_CONFIG
 #pragma once
+// clange-format off
 
 // #define DLP_WIN32
 // #define DLP_USE_DLLEXPORT
@@ -10,8 +11,9 @@
 #define SPECIAL_DLP_VERSION
 #define DLP_CHAR_TYPE wchar_t
 #define DLP_WINT_TYPE wint_t
-#define DLP_VERSION_PATCH(Major, Minor, Patch)                                 \
-  (Major * 10000UL + Minor * 100UL + Patch)
+#define DLP_EOF WEOF
+#define DLP_VERSION_PATCH(Major, Minor, Patch) (Major * 10000UL + Minor * 100UL + Patch)
 #define DLP_VERSION DLP_VERSION_PATCH(1, 0, 0)
 
+// clange-format on
 #endif // DLP_ONCE__DLP_CONFIG

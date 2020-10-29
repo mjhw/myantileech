@@ -19,7 +19,7 @@ DLP_BEGIN_NAMESPACE
 using namespace win32_data_types;
 #endif
 
-static const LPCTSTR DLP_MODVERSION_CASE_INSENSITIVE_SOFT[] = {
+static const LPCTSTR DLP_MODVERSION_SOFT_ICASE[] = {
     _T("Rockesel"),
     _T("HARDMULE"),
     _T("Community"),
@@ -41,9 +41,9 @@ static const LPCTSTR DLP_MODVERSION_CASE_INSENSITIVE_SOFT[] = {
     _T(".NET"),
     _T(".BIZ"),
     _T(".INFO"),
-}; // DLP_MODVERSION_CASE_INSENSITIVE_SOFT
+}; // DLP_MODVERSION_SOFT_ICASE
 
-static const LPCTSTR DLP_MODVERSION_CASE_INSENSITIVE_HARD[] = {
+static const LPCTSTR DLP_MODVERSION_HARD_ICASE[] = {
     _T("080509"),      // XL
     _T("20080505"),    // XL
     _T("080620"),      // XL
@@ -299,9 +299,9 @@ static const LPCTSTR DLP_MODVERSION_CASE_INSENSITIVE_HARD[] = {
     _T("Xtreme Xtended"), // Xman 15.08.05
     _T("ZamBoR"),
     _T("ZZULtra"),
-}; //  DLP_MODVERSION_CASE_INSENSITIVE_HARD
+}; //  DLP_MODVERSION_HARD_ICASE
 
-static const LPCTSTR DLP_USERNAME_CASE_INSENSITIVE_HARD[] = {
+static const LPCTSTR DLP_USERNAME_HARD_ICASE[] = {
     _T("00de.de"),
     _T("28881.com"),        // MTVP2P(2013) [雁蝎]
     _T("a1[VeryCD]xthame"), // XL
@@ -541,7 +541,33 @@ static const LPCTSTR DLP_USERNAME_CASE_INSENSITIVE_HARD[] = {
     _T("zultrax.com"),
     _T("ZZ-R "),
     _T("ZZULtimativ-R"),
-}; // DLP_USERNAME_CASE_INSENSITIVE_HARD
+}; // DLP_USERNAME_HARD_ICASE
+
+static const LPCTSTR DLP_USERNAME_SOFT_ICASE[] = {
+    _T(">>Power-Mod"), // Xman 15.08.05
+    // zz_fly Start korea
+    _T("DONKEY2007"), // korea
+    _T("www.Freang.com"), _T("www.pruna.com"), _T("[KOREA]"), _T("superemule"),
+    _T("PRUNA 2008"), _T("MOYAM"), _T("eDonkey2009"),
+    // zz_fly End
+}; // DLP_USERNAME_SOFT_ICASE
+
+static const LPCTSTR DLP_USERHASH_SOFT_ICASE[] = {
+    _T("154CE646120E96CC798C439A20D26F8D"), // (windows ue)
+    _T("455361F9D95C3CD7E6BF2192D1CB3D02"), // (windows ue)
+    _T("C8B5F41441C615FBABAD9A7E55294D01"),
+    _T("A2221641460E961C8B7FF21A53FB6F6C"), //**Riso64Bit**
+    _T("888F4742450EF75F9DD8B7E53FA06FF0"), //**Riso64Bit**
+    _T("0B76CC42CB0E81B0DC6120D2BCB36FF9"), //**Riso64Bit**
+    _T("EAA383FD9E0E68538C7AC8AD15526F7A"), //**Riso64Bit**
+    _T("65C3B2E8940E582630A7F58AF9F26F9E"), // from TaiWan
+    _T("9BA09B83DC0EE78BE20280C387936F00"), // from SS1900
+    _T("C92859E4860EA0F15F7837750C886FB6"), // from SS1900
+    _T("CB42F563EE0EA7907395420CAC146FF5"), // From "qobfxb" multi user
+    _T("00000000000E00000000000000006F00"),
+    _T("FE000000000E00000000000000006F00"),
+    _T("DA1CEEE05B0E5319B3B48CAED24C6F4A"),
+}; // DLP_USERHASH_SOFT_ICASE
 
 ////////////////////////////////////////////////////////////////////////
 DLP_END_NAMESPACE

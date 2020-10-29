@@ -122,15 +122,15 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Hard(LPCTSTR modversion,
   }
 
   DenyList denylist;
-  denylist.options = DenyList_Modversion_Hard | DenyList_CaseInsensitive;
+  denylist.options = DenyList_ModVersion_Hard | DenyList_CaseInsensitive;
   GetDenyList(&denylist);
   for (size_t i = 0; i < denylist.size; ++i) {
     if (denylist.check(modversion, denylist.data[i]))
-      return _T("Bad MODSTRING");
+      return _T("DenyList_ModVersion_Hard");
   }
 
   if (IS_SPACE(modversion)) {
-    return _T("Bad MODSTRING");
+    return _T("Bad ModString");
   }
 
   return NULL;
@@ -143,17 +143,17 @@ LPCTSTR CantiLeech__ DLPCheckModstring_Soft(LPCTSTR modversion,
   }
 
   DenyList denylist;
-  denylist.options = DenyList_Modversion_Soft | DenyList_CaseInsensitive;
+  denylist.options = DenyList_ModVersion_Soft | DenyList_CaseInsensitive;
   GetDenyList(&denylist);
   for (size_t i = 0; i < denylist.size; ++i) {
     if (denylist.check(modversion, denylist.data[i]))
-      return _T("Bad MODSTRING");
+      return _T("DenyList_ModVersion_Soft");
   }
 
   if ((STRSTR(clientversion, _T("lphant v2.01")) &&
        STRSTR(modversion, _T("Plus"))) // www.lphantplus.com, no src
       /* END */) {
-    return _T("Bad MODSTRING");
+    return _T("Bad ModString");
   }
 
   return NULL;
@@ -165,15 +165,15 @@ LPCTSTR CantiLeech__ DLPCheckUsername_Hard(LPCTSTR username) {
   }
 
   DenyList denylist;
-  denylist.options = DenyList_Username_Hard | DenyList_CaseInsensitive;
+  denylist.options = DenyList_UserName_Hard | DenyList_CaseInsensitive;
   GetDenyList(&denylist);
   for (size_t i = 0; i < denylist.size; ++i) {
     if (denylist.check(username, denylist.data[i]))
-      return _T("Bad USERNAME");
+      return _T("DenyList_UserName_Hard");
   }
 
   if (IS_SPACE(username)) {
-    return _T("Bad USERNAME");
+    return _T("Bad UserName");
   }
 
   // new ketamine
@@ -194,25 +194,12 @@ LPCTSTR CantiLeech__ DLPCheckUsername_Soft(LPCTSTR username) {
     return NULL;
   }
 
-  if ( // Xman 15.08.05
-      STRISTR(username, _T(">>Power-Mod"))
-      // Xman 1/2007
-      /*
-        STRISTR(username,_T("AppleJuice [")) && STRISTR(username,_T("]")) ||
-        STRISTR(username,_T("AppleJuice Mod [")) && STRISTR(username,_T("]")) ||
-        STRISTR(username,_T("AppleJuice eMule [")) && STRISTR(username,_T("]"))
-        //5/2007
-      */
-      // zz_fly Start korea
-      || STRSTR(username, _T("DONKEY2007")) // korea
-      || STRSTR(username, _T("www.Freang.com")) ||
-      STRSTR(username, _T("www.pruna.com")) ||
-      STRSTR(username, _T("[KOREA]")) || STRSTR(username, _T("superemule")) ||
-      STRSTR(username, _T("PRUNA 2008")) || STRSTR(username, _T("MOYAM")) ||
-      STRSTR(username, _T("eDonkey2009"))
-      // zz_fly End
-      /* END */) {
-    return _T("Bad USERNAME");
+  DenyList denylist;
+  denylist.options = DenyList_UserName_Soft | DenyList_CaseInsensitive;
+  GetDenyList(&denylist);
+  for (size_t i = 0; i < denylist.size; ++i) {
+    if (denylist.check(username, denylist.data[i]))
+      return _T("DenyList_UserName_Soft");
   }
 
   // bad mods, where every second sign is
@@ -242,34 +229,12 @@ LPCTSTR CantiLeech__ DLPCheckNameAndHashAndMod(
     return NULL;
   }
 
-  static const LPCTSTR community_userhash_list[] = {
-      // clang-format off
-      _T("154CE646120E96CC798C439A20D26F8D"), // (windows ue)
-      _T("455361F9D95C3CD7E6BF2192D1CB3D02"), // (windows ue)
-      _T("C8B5F41441C615FBABAD9A7E55294D01"),
-      _T("A2221641460E961C8B7FF21A53FB6F6C"), //**Riso64Bit**
-      _T("888F4742450EF75F9DD8B7E53FA06FF0"), //**Riso64Bit**
-      _T("0B76CC42CB0E81B0DC6120D2BCB36FF9"), //**Riso64Bit**
-      _T("EAA383FD9E0E68538C7AC8AD15526F7A"), //**Riso64Bit**
-      _T("65C3B2E8940E582630A7F58AF9F26F9E"), // from TaiWan
-      _T("9BA09B83DC0EE78BE20280C387936F00"), // from SS1900
-      _T("C92859E4860EA0F15F7837750C886FB6"), // from SS1900
-      _T("CB42F563EE0EA7907395420CAC146FF5"), // From "qobfxb" multi user
-      // clang-format on
-  };
-  for (int i = 0; i < ARRAY_COUNT(community_userhash_list); ++i) {
-    if (STRICMP(userhash, community_userhash_list[i]) == 0)
-      return _T("Community Userhash");
-  }
-
-  static const LPCTSTR corrupt_userhash_list[] = {
-      _T("00000000000E00000000000000006F00"),
-      _T("FE000000000E00000000000000006F00"),
-      _T("DA1CEEE05B0E5319B3B48CAED24C6F4A"),
-  };
-  for (int i = 0; i < ARRAY_COUNT(community_userhash_list); ++i) {
-    if (STRICMP(userhash, corrupt_userhash_list[i]) == 0)
-      return _T("Corrupt UserHash");
+  DenyList denylist;
+  denylist.options = DenyList_UserHash_Soft | DenyList_CaseInsensitive;
+  GetDenyList(&denylist);
+  for (size_t i = 0; i < denylist.size; ++i) {
+    if (STRICMP(userhash, denylist.data[i]) == 0)
+      return _T("Bad UserHash");
   }
 
   // Check for aedit

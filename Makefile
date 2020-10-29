@@ -140,7 +140,7 @@ endif
 install:
 	$(__testfile) $(__target_file)
 	$(__mkdir) $(install_dir)
-	$(__testfile) $(install_dir)/$(__target_basename) && \
+#	$(__testfile) $(install_dir)/$(__target_basename) && \
 $(__mv) $(install_dir)/$(__target_basename) $(install_dir)/$(__target_basename).old
 	$(__install) $(__target_file) $(install_dir)
 

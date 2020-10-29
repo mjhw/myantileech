@@ -12,6 +12,8 @@
 #include <pthread.h>
 #endif
 
+#include <string>
+
 #include "dlp_functions.h"
 
 #define DLP_PRIVATE__DLP_DENYLIST
@@ -55,6 +57,34 @@ void InitGlobalDenyList(void) {
 
 END_PRIVATE_NAMESPACE
 
+std::basic_string<TCHAR> DenyListOptionsToString(size_t opts) {
+  std::basic_string<TCHAR> ret;
+  LPCTSTR s = NULL;
+  size_t bit = 0x1;
+  // clang-format off
+  for (size_t t = opts; t; t >>= 1) {
+    size_t o = opts & bit;
+    bit <<= 1;
+    switch (o) {
+    case DenyList_Default:         s = _T("DenyList_Default"); break;
+    case DenyList_CaseInsensitive: s = _T("DenyList_CaseInsensitive"); break;
+    case DenyList_Regex:           s = _T("DenyList_Regex"); break;
+    case DenyList_ModVersion_Hard: s = _T("DenyList_ModVersion_Hard"); break;
+    case DenyList_ModVersion_Soft: s = _T("DenyList_ModVersion_Soft"); break;
+    case DenyList_UserName_Hard:   s = _T("DenyList_UserName_Hard"); break;
+    case DenyList_UserName_Soft:   s = _T("DenyList_UserName_Soft"); break;
+    case DenyList_UserHash_Soft:   s = _T("DenyList_UserHash_Soft"); break;
+    default:                       s = NULL; break;
+    }
+    if (s) {
+      if (!ret.empty()) ret += _T('|');
+      ret += s;
+    }
+  }
+  // clang-format on
+  return ret;
+}
+
 void InitOnceGlobalDenyList() {
 #if defined(DLP_CXX11)
   static std::once_flag once_flag;
@@ -62,13 +92,16 @@ void InitOnceGlobalDenyList() {
     std::call_once(once_flag, p__::InitGlobalDenyList);
   } catch (...) {
     // TODO
+    DLP_CDBG << "std::call_once" << std::endl;
   }
 #elif defined(DLP_WIN32)
   static ::INIT_ONCE once_flag = INIT_ONCE_STATIC_INIT;
   BOOL status =
       ::InitOnceExecuteOnce(&once_flag, p__::InitGlobalDenyList, NULL, NULL);
   // TODO
-  (void)status;
+  if (!status) {
+    DLP_CDBG << "::InitOnceExecuteOnce" << std::endl;
+  }
 #else
   static ::pthread_once_t once_flag = PTHREAD_ONCE_INIT;
   ::pthread_once(&once_flag, p__::InitGlobalDenyList); // always returns 0.
@@ -92,13 +125,16 @@ DenyList *GetDenyList(DenyList *list) {
   case DenyList_UserName_Hard:
     XX(DLP_USERNAME_HARD_ICASE);
     break;
+  case DenyList_UserName_Soft:
+    XX(DLP_USERNAME_SOFT_ICASE);
+    break;
   case DenyList_UserHash_Soft:
     XX(DLP_USERHASH_SOFT_ICASE);
     break;
   default:
-    DLP_CDBG << _T("Invalid DenyList_Options: (hex)") << std::hex
-             << list->options << std::dec << std::endl;
-    DLP_ASSERT(false);
+    DLP_CDBG << _T("[hex:") << std::hex << list->options << std::dec
+             << _T("]: ") << DenyListOptionsToString(list->options)
+             << std::endl;
     list->data = NULL;
     list->size = 0;
     list->check = NULL;
@@ -121,9 +157,9 @@ DenyList *GetDenyList(DenyList *list) {
       list->check = STREISTR;
       break;
     default:
-      DLP_CDBG << _T("Invalid DenyList_Options: (hex)") << std::hex
-               << list->options << std::dec << std::endl;
-      DLP_ASSERT(false);
+      DLP_CDBG << _T("[hex:") << std::hex << list->options << std::dec
+               << _T("]: ") << DenyListOptionsToString(list->options)
+               << std::endl;
       list->data = NULL;
       list->size = 0;
       list->check = NULL;

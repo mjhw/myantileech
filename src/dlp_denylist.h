@@ -23,9 +23,9 @@ enum DenyListOptions {
   DenyList_Regex = 0x1 << 1,
   DenyList_ModVersion_Hard = 0x1 << 2,
   DenyList_ModVersion_Soft = 0x1 << 3,
-  DenyList_UserName_Hard = 0x1 << 5,
-  DenyList_UserName_Soft = 0x1 << 6,
-  DenyList_UserHash_Soft = 0x1 << 7,
+  DenyList_UserName_Hard = 0x1 << 4,
+  DenyList_UserName_Soft = 0x1 << 5,
+  DenyList_UserHash_Soft = 0x1 << 6,
 };
 
 typedef struct DenyList {

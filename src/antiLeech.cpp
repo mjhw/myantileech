@@ -357,11 +357,13 @@ LPCTSTR CantiLeech__ DLPCheckNameAndHashAndMod(
   };
   for (int i = 0; i < ARRAY_COUNT(modString_minVer_list); ++i) {
     LPCTSTR tag = STRSTR(username, modString_minVer_list[i].first);
-    if (!tag && STRSTR(modversion, modString_minVer_list[i].first)) {
-      const float version = STRTOF(modversion.Right(4), NULL);
-      if (modString_minVer_list[i].second == 0.0f || version == 9.7f ||
-          version >= modString_minVer_list[i].second) {
-        return _T("ModString Thief");
+    if (STRSTR(modversion, modString_minVer_list[i].first + 1)) {
+      if (!tag) {
+        const float version = STRTOF(modversion.Right(4), NULL);
+        if (modString_minVer_list[i].second == 0.0f || version == 9.7f ||
+            version >= modString_minVer_list[i].second) {
+          return _T("ModString Thief");
+        }
       }
     } else if (tag) {
       return _T("ModString Thief");
